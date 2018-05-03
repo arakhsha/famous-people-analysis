@@ -11,8 +11,8 @@ data$birthyear = as.numeric(data$birthyear)
 #birth locations
 data = data %>%
   group_by(birthcity) %>% 
-  mutate(LAT = ifelse(is.na(LAT) & birthcity != 'Other', first(LAT[!is.na(LAT)]), LAT),
-         LON = ifelse(is.na(LON) & birthcity != 'Other', first(LON[!is.na(LON)]), LON)
+  mutate(LAT = ifelse(is.na(LAT) & !is.na(birthcity), first(LAT[!is.na(LAT)]), LAT),
+         LON = ifelse(is.na(LON) & !is.na(birthcity), first(LON[!is.na(LON)]), LON)
   ) %>% 
   ungroup()
 
