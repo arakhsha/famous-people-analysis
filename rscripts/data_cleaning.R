@@ -4,8 +4,8 @@ data = read_tsv('data/pantheon/pantheon.tsv')
 data[data == 'Unknown' | data == 'Other' | data == 'UNK'] = NA
 
 #birthyear
-data[data$birthyear == '530s', "birthyear"] = 535
-data[data$birthyear == '1237?', "birthyear"] = 1237
+data$birthyear[data$birthyear == '530s'] = 535
+data$birthyear[data$birthyear == '1237?'] = 1237
 data$birthyear = as.numeric(data$birthyear)
 
 #birth locations
