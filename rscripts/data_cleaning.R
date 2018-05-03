@@ -1,5 +1,8 @@
 data = read_tsv('data/pantheon/pantheon.tsv')
 
+#creating NA
+data[data == 'Unknown' | data == 'Other' | data == 'UNK'] = NA
+
 #birthyear
 data[data$birthyear == '530s', "birthyear"] = 535
 data[data$birthyear == '1237?', "birthyear"] = 1237
