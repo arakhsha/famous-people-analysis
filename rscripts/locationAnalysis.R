@@ -46,10 +46,12 @@ worldBubbleTimePlot = hcmap(download_map_data = F) %>%
   hc_add_series(data = SPORTS, type = "mapbubble", showInLegend = T, name = 'SPORTS',
                 minSize = 0, maxSize = 10, zThreshold = 0, displayNegative = F) %>% 
   
-  hc_motion(enabled = TRUE, series = 1:8, labels = centuries,
-            loop = TRUE, autoPlay = TRUE,
+  hc_motion(enabled = TRUE, series = 1:8, labels = paste(centuries, 'Century'),
+            loop = TRUE, autoPlay = TRUE, axisLabel = 'Century',
             updateInterval = 1000, magnet = list(step =  1)) %>%
   hc_plotOptions(series = list(showInLegend = FALSE)) %>% 
   hc_mapNavigation(enabled = TRUE) %>% 
-  hc_legend(enabled = T)
+  hc_legend(enabled = T) %>% 
+  hc_tooltip(valueDecimals = 0) %>% 
+  hc_title(text = 'Globally Famous People Over Time')
 write_rds(worldBubbleTimePlot, 'output/worldBubbleTimePlot.rds')
