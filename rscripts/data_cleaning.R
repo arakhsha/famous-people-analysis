@@ -15,5 +15,16 @@ data = data %>%
          LON = ifelse(is.na(LON) & !is.na(birthcity), first(LON[!is.na(LON)]), LON)
   ) %>% 
   ungroup()
-
+locationNAs = data %>% filter(is.na(LAT) | is.na(LON))
+missingCitiesLocation = read_csv('data/generated/missingCitiesLocations.csv')
+locationNAs = left_join(
+  locationNAs %>% select(-LON, -LAT),  
+  missingCitiesLocation %>% rename(birthcity = city, LON = lon, LAT = lat),
+  by = 'birthcity'
+)
+data = rbind(
+    data %>% filter(!is.na(LON), !is.na(LAT)),
+    locationNAs
+  ) %>% 
+  arrange(name)
 write_csv(data, 'data/generated/pantheon_cleaned.csv')
