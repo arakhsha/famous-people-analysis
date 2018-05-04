@@ -7,6 +7,15 @@ bubbleData = data %>%
 
 centuries = min(bubbleData$century, na.rm = T):max(bubbleData$century, na.rm = T)
 
+scaleRows = data.frame(name = rep('Scale', 2 * length(centuries)),
+                       HPI = c(rep(min(bubbleData$HPI), length(centuries)),
+                               rep(max(bubbleData$HPI), length(centuries))),
+                       century = c(centuries, centuries),
+                       lat = rep(-40, 2 * length(centuries)),
+                       lon = rep(-40, 2 * length(centuries)),
+                       domain = rep('SCALE', 2 * length(centuries)))
+bubbleData = rbind(bubbleData, scaleRows)
+
 bubbleData = bubbleData %>% 
   mutate(z = HPI)
 
@@ -26,27 +35,30 @@ FIGURE = bubbleData %>% filter(domain == 'PUBLIC FIGURE')
 LAW = bubbleData %>% filter(domain == 'BUSINESS & LAW')
 EXPLORATION = bubbleData %>% filter(domain == 'EXPLORATION')
 SPORTS = bubbleData %>% filter(domain == 'SPORTS')
+SCALE = bubbleData %>% filter(domain == 'SCALE')
 
 worldBubbleTimePlot = hcmap(download_map_data = F) %>% 
   
   hc_add_series(data = INSTITUTIONS, type = "mapbubble", showInLegend = T, name = 'INSTITUTIONS',
-                minSize = 0, maxSize = 10, zThreshold = 0, displayNegative = F) %>% 
+                minSize = 0, maxSize = 20, zThreshold = 0, displayNegative = F) %>% 
   hc_add_series(data = HUMANITIES, type = "mapbubble", showInLegend = T, name = 'HUMANITIES',
-                minSize = 0, maxSize = 10, zThreshold = 0, displayNegative = F) %>% 
+                minSize = 0, maxSize = 20, zThreshold = 0, displayNegative = F) %>% 
   hc_add_series(data = SCIENCE, type = "mapbubble", showInLegend = T, name = 'SCIENCE & TECHNOLOGY',
-                minSize = 0, maxSize = 10, zThreshold = 0, displayNegative = F) %>% 
+                minSize = 0, maxSize = 20, zThreshold = 0, displayNegative = F) %>% 
   hc_add_series(data = ARTS, type = "mapbubble", showInLegend = T, name = 'ARTS',
-                minSize = 0, maxSize = 10, zThreshold = 0, displayNegative = F) %>% 
+                minSize = 0, maxSize = 20, zThreshold = 0, displayNegative = F) %>% 
   hc_add_series(data = FIGURE, type = "mapbubble", showInLegend = T, name = 'PUBLIC FIGURE',
-                minSize = 0, maxSize = 10, zThreshold = 0, displayNegative = F) %>% 
+                minSize = 0, maxSize = 20, zThreshold = 0, displayNegative = F) %>% 
   hc_add_series(data = LAW, type = "mapbubble", showInLegend = T, name = 'BUSINESS & LAW',
-                minSize = 0, maxSize = 10, zThreshold = 0, displayNegative = F) %>% 
+                minSize = 0, maxSize = 20, zThreshold = 0, displayNegative = F) %>% 
   hc_add_series(data = EXPLORATION, type = "mapbubble", showInLegend = T, name = 'EXPLORATION',
-                minSize = 0, maxSize = 10, zThreshold = 0, displayNegative = F) %>% 
+                minSize = 0, maxSize = 20, zThreshold = 0, displayNegative = F) %>% 
   hc_add_series(data = SPORTS, type = "mapbubble", showInLegend = T, name = 'SPORTS',
-                minSize = 0, maxSize = 10, zThreshold = 0, displayNegative = F) %>% 
-  
-  hc_motion(enabled = TRUE, series = 1:8, labels = paste(centuries, 'Century'),
+                minSize = 0, maxSize = 20, zThreshold = 0, displayNegative = F) %>% 
+  hc_add_series(data = SCALE, type = "mapbubble", showInLegend = F, name = 'SCALE',
+                minSize = 0, maxSize = 20, zThreshold = 0, displayNegative = F,
+                color = 'rgba(255, 255, 255, 0)', enableMouseTracking = F) %>% 
+  hc_motion(enabled = TRUE, series = 1:9, labels = paste(centuries, 'Century'),
             loop = TRUE, autoPlay = TRUE, axisLabel = 'Century',
             updateInterval = 1000, magnet = list(step =  1)) %>%
   hc_plotOptions(series = list(showInLegend = FALSE)) %>% 
@@ -54,4 +66,5 @@ worldBubbleTimePlot = hcmap(download_map_data = F) %>%
   hc_legend(enabled = T) %>% 
   hc_tooltip(valueDecimals = 0) %>% 
   hc_title(text = 'Globally Famous People Over Time')
+worldBubbleTimePlot
 write_rds(worldBubbleTimePlot, 'output/worldBubbleTimePlot.rds')
