@@ -18,11 +18,11 @@ output:
 </div>
 
 <p class = "persian_header">
-فایلهای پروژه
+فایل&zwnj;های پروژه
 </p>
 
 <div class = "persian_normal">
-ساختار فایلهای پروژه به شکل زیر است:
+ساختار فایل&zwnj;های پروژه به شکل زیر است:
 </div>
 
 ```{r eval = F}
@@ -50,4 +50,30 @@ ReadMe.md
 .gitignore
 DA_project.Rproj
 ```
+
+
+<div class = "persian_normal">
+data:
+در این پوشه داده&zwnj;ها قرار می&zwnj;گیرند. Pantheon و HA (که به آن خواهیم پرداخت)  داده&zwnj;های خام هستند.  پوشه&zwnj;ی generated شامل داده&zwnj;هایی است که از روی داده&zwnj;ی خام یا با اجرای یک کد به دست می&zwnj;آید. 
+</div>
+
+<div class = "persian_normal">
+rscripts:
+دکدها در این پوشه قرار دارند. فایل requirements.R شامل تمام کتابخانه&zwnj;های ضروری برای اجرای کدها است.
+</div>
+
+<div class = "persian_normal">
+output:
+در این پوشه خروجی کدها برای مثال نمودارها قرار داده می&zwnj;شوند. در گزارش&zwnj;ها از این فایل&zwnj;ها استفاده می&zwnj;شود.
+</div>
+
+<div class = "persian_normal">
+reports:
+گزارش&zwnj;ها در این پوشه قرار داده می&zwnj;شوند. گزارش تحلیل هر موضوع در گزارشی جدا قرار خواهد گرفت.
+</div>
+
+<div class = "persian_normal">
+run_all.R:
+این کد تمام کدها را اجرا می&zwnj;کند تا گزارش&zwnj;ها تولید شوند.
+</div>
 
