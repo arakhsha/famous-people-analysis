@@ -45,7 +45,9 @@ rscripts
 output
 |-- worldBubbleTimePlot.rds
 |-- worldPointPlot.rds
-run_all.R     # *** Most important file ***
+run_all.R
+ReadMe.md
+.gitignore
 DA_project.Rproj
 ```
 
