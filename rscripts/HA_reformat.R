@@ -32,8 +32,8 @@ HA_unique = HA %>%
 to.plain <- function(s) {
   
   # 1 character substitutions
-  old1 <- "šžþàáâãäåçèéêëìíîïðñòóôõöùúûüý"
-  new1 <- "szyaaaaaaceeeeiiiidnooooouuuuy"
+  old1 <- "šžþàáâãäåçćčèéêëìíîïðñòóôõöùúûüý"
+  new1 <- "szyaaaaaaccceeeeiiiidnooooouuuuy"
   s1 <- chartr(old1, new1, s)
   
   # 2 character substitutions
