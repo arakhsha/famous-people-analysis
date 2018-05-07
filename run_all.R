@@ -1,0 +1,6 @@
+source('rscripts/requirements.R')
+source('rscripts/locationFetch.R')
+source('rscripts/data_cleaning.R')
+source('rscripts/HA_Linkage.R')
+source('rscripts/locationAnalysis.R')
+source('rscripts/genderAnalysis.R')
