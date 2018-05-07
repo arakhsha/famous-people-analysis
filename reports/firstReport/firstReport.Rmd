@@ -83,6 +83,107 @@ run_all.R:
 
 <div class = "persian_normal">
 برای کنترل نسخه از github استفاده کردیم. می&zwnj;توانید آن را در
-<a href = 'https://github.com/arakhsha/famous-people-analysis'> اینجا </a>
+<a href = 'https://github.com/arakhsha/famous-people-analysis' target = '_blank'> اینجا </a>
 مشاهده کنید. با توجه به یک نفری بودن پروژه نیازی به همگام سازی مداوم نسخه&zwnj;ی آنلاین نیست و معمولا مقداری عقب&zwnj;تر است.
+</div>
+
+<p class = "persian_header">
+تمیزسازی داده
+</p>
+
+<div class = "persian_normal">
+برای استفاده و هرگونه تحلیلی نیاز داشتیم که برخی مشکلات داده را برطرف کنیم.  برای همین در data_cleaning.R به این کار پرداخته&zwnj;ایم. اولین مشکل این بود که در داده، برای برخی مقادیر که موجود نبودند، مقدارهایی از قبیل Other و ... ذکر شده بود که حل آن ساده بود:
+</div>
+
+```{r eval = FALSE}
+data[data == 'Unknown' | data == 'Other' | data == 'UNK'] = NA
+```
+
+
+<div class = "persian_normal">
+مشکل بعدی عددی نبودن برخی تاریخ&zwnj;های تولد بود که با توجه به تعداد کم آن&zwnj;ها به سادگی حل شد:
+</div>
+
+```{r eval = FALSE}
+#birthyear
+data$birthyear[data$birthyear == '530s'] = 535
+data$birthyear[data$birthyear == '1237?'] = 1237
+data$birthyear = as.numeric(data$birthyear)
+```
+
+<div class = "persian_normal">
+مشکل اصلی اما موجود نبودن مختصات جغرافیایی برای بخش مهمی از داده بود. با توجه به این که افراد در این داده از زمان&zwnj;های بسیار دور هستند، محل تولد آن&zwnj;ها با توجه به مرزهایی کنونی آنقدر اهمیت ندارد زیرا این مرزها بسیار تفاوت کرده&zwnj;اند برای همین داشتن مختصات جغرافیایی نه تنها برای تصویرسازی&zwnj;ها مهم است، برای تحلیل&zwnj;های جغرافیایی هم حیاتی است. خوشبختانه اسم شهر، یا کشور محل تولد تعداد قابل قبولی از این افراد موجود بود. برای یافتن مختصات جغرافیایی از google maps و پکیج ggmap برای استخراج مختصات استفاده کردیم. که اصلا ساده نبود. علاوه بر محدودیت&zwnj;های api که از سرعت می&zwnj;کاست و به خطاهای نامربوط منجر می&zwnj;شد، تحریم بودن این سرویس هم کار را مشکل کرد. مجبور شدیم برای هر شهر، به طور میانگین ۵ درخواست ارسال کنیم که با توجه به محدودیت&zwnj;ها مشکلاتی ایجاد کرد. این فرایند در فایل locationFetch.R انجام می&zwnj;شود و نتیجه با نام missingCitiesLocations.csv ذخیره می&zwnj;شود:
+</div>
+
+```{r eval = FALSE}
+locationNAs = data %>% filter(is.na(LAT) | is.na(LON))
+
+missingCities = sort(unique(locationNAs$birthcity))
+missingCities = missingCities[!is.na(missingCities)]
+
+missingCitiesLocations = data.frame(city = character(), lon = numeric(), lat = numeric())
+for(city in missingCities[51:171]) {
+  print(which(missingCities == city))
+  try = TRUE;
+  while(try) {
+    tryCatch(
+      {
+        result = geocode(city, force = T)
+        try = FALSE
+      },
+      warning = function(war) {
+        if(str_detect(war, 'OVER_QUERY_LIMIT')) {
+          print(war)
+          try <<- TRUE
+        }
+        else {
+          print(war)
+          try <<- FALSE
+          result <<- data.frame(lon = NA, lat = NA)
+        }
+      })
+  }
+  row = cbind(as.data.frame(city), result)
+  print(row)
+  missingCitiesLocations = rbind(missingCitiesLocations, row)
+}
+
+write_csv(missingCitiesLocations, 'data/generated/missingCitiesLocations.csv')
+```
+
+<div class = "persian_normal">
+در نهایت در data_cleaning.R این مختصات را به داده اضافه کردیم و داده&zwnj;ی تمیز شده&zwnj;ی نهایی را به نام pantheon_cleaned.csv ذخیره کردیم:
+</div>
+
+
+```{r eval = FALSE}
+
+#birth locations
+data = data %>%
+  group_by(birthcity) %>% 
+  mutate(LAT = ifelse(is.na(LAT) & !is.na(birthcity), first(LAT[!is.na(LAT)]), LAT),
+         LON = ifelse(is.na(LON) & !is.na(birthcity), first(LON[!is.na(LON)]), LON)
+  ) %>% 
+  ungroup()
+locationNAs = data %>% filter(is.na(LAT) | is.na(LON))
+missingCitiesLocation = read_csv('data/generated/missingCitiesLocations.csv')
+locationNAs = left_join(
+  locationNAs %>% select(-LON, -LAT),  
+  missingCitiesLocation %>% rename(birthcity = city, LON = lon, LAT = lat),
+  by = 'birthcity'
+)
+data = rbind(
+    data %>% filter(!is.na(LON), !is.na(LAT)),
+    locationNAs
+  ) %>% 
+  arrange(name)
+write_csv(data, 'data/generated/pantheon_cleaned.csv')
+```
+
+<div class = "persian_normal">
+
+</div>
+
+<div class = "persian_normal">
+
 </div>

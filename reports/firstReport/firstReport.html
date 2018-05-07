@@ -131,7 +131,86 @@ DA_project.Rproj</code></pre></div>
 کنترل نسخه
 </p>
 <div class="persian_normal">
-<p>برای کنترل نسخه از github استفاده کردیم. می‌توانید آن را در <a href="https://github.com/arakhsha/famous-people-analysis"> اینجا </a> مشاهده کنید. با توجه به یک نفری بودن پروژه نیازی به همگام سازی مداوم نسخه‌ی آنلاین نیست و معمولا مقداری عقب‌تر است.</p>
+<p>برای کنترل نسخه از github استفاده کردیم. می‌توانید آن را در <a href="https://github.com/arakhsha/famous-people-analysis" target="_blank"> اینجا </a> مشاهده کنید. با توجه به یک نفری بودن پروژه نیازی به همگام سازی مداوم نسخه‌ی آنلاین نیست و معمولا مقداری عقب‌تر است.</p>
+</div>
+<p class="persian_header">
+تمیزسازی داده
+</p>
+<div class="persian_normal">
+<p>برای استفاده و هرگونه تحلیلی نیاز داشتیم که برخی مشکلات داده را برطرف کنیم. برای همین در data_cleaning.R به این کار پرداخته‌ایم. اولین مشکل این بود که در داده، برای برخی مقادیر که موجود نبودند، مقدارهایی از قبیل Other و … ذکر شده بود که حل آن ساده بود:</p>
+</div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data[data <span class="op">==</span><span class="st"> 'Unknown'</span> <span class="op">|</span><span class="st"> </span>data <span class="op">==</span><span class="st"> 'Other'</span> <span class="op">|</span><span class="st"> </span>data <span class="op">==</span><span class="st"> 'UNK'</span>] =<span class="st"> </span><span class="ot">NA</span></code></pre></div>
+<div class="persian_normal">
+<p>مشکل بعدی عددی نبودن برخی تاریخ‌های تولد بود که با توجه به تعداد کم آن‌ها به سادگی حل شد:</p>
+</div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#birthyear</span>
+data<span class="op">$</span>birthyear[data<span class="op">$</span>birthyear <span class="op">==</span><span class="st"> '530s'</span>] =<span class="st"> </span><span class="dv">535</span>
+data<span class="op">$</span>birthyear[data<span class="op">$</span>birthyear <span class="op">==</span><span class="st"> '1237?'</span>] =<span class="st"> </span><span class="dv">1237</span>
+data<span class="op">$</span>birthyear =<span class="st"> </span><span class="kw">as.numeric</span>(data<span class="op">$</span>birthyear)</code></pre></div>
+<div class="persian_normal">
+<p>مشکل اصلی اما موجود نبودن مختصات جغرافیایی برای بخش مهمی از داده بود. با توجه به این که افراد در این داده از زمان‌های بسیار دور هستند، محل تولد آن‌ها با توجه به مرزهایی کنونی آنقدر اهمیت ندارد زیرا این مرزها بسیار تفاوت کرده‌اند برای همین داشتن مختصات جغرافیایی نه تنها برای تصویرسازی‌ها مهم است، برای تحلیل‌های جغرافیایی هم حیاتی است. خوشبختانه اسم شهر، یا کشور محل تولد تعداد قابل قبولی از این افراد موجود بود. برای یافتن مختصات جغرافیایی از google maps و پکیج ggmap برای استخراج مختصات استفاده کردیم. که اصلا ساده نبود. علاوه بر محدودیت‌های api که از سرعت می‌کاست و به خطاهای نامربوط منجر می‌شد، تحریم بودن این سرویس هم کار را مشکل کرد. مجبور شدیم برای هر شهر، به طور میانگین ۵ درخواست ارسال کنیم که با توجه به محدودیت‌ها مشکلاتی ایجاد کرد. این فرایند در فایل locationFetch.R انجام می‌شود و نتیجه با نام missingCitiesLocations.csv ذخیره می‌شود:</p>
+</div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">locationNAs =<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(<span class="kw">is.na</span>(LAT) <span class="op">|</span><span class="st"> </span><span class="kw">is.na</span>(LON))
+
+missingCities =<span class="st"> </span><span class="kw">sort</span>(<span class="kw">unique</span>(locationNAs<span class="op">$</span>birthcity))
+missingCities =<span class="st"> </span>missingCities[<span class="op">!</span><span class="kw">is.na</span>(missingCities)]
+
+missingCitiesLocations =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">city =</span> <span class="kw">character</span>(), <span class="dt">lon =</span> <span class="kw">numeric</span>(), <span class="dt">lat =</span> <span class="kw">numeric</span>())
+<span class="cf">for</span>(city <span class="cf">in</span> missingCities[<span class="dv">51</span><span class="op">:</span><span class="dv">171</span>]) {
+  <span class="kw">print</span>(<span class="kw">which</span>(missingCities <span class="op">==</span><span class="st"> </span>city))
+  try =<span class="st"> </span><span class="ot">TRUE</span>;
+  <span class="cf">while</span>(try) {
+    <span class="kw">tryCatch</span>(
+      {
+        result =<span class="st"> </span><span class="kw">geocode</span>(city, <span class="dt">force =</span> T)
+        try =<span class="st"> </span><span class="ot">FALSE</span>
+      },
+      <span class="dt">warning =</span> <span class="cf">function</span>(war) {
+        <span class="cf">if</span>(<span class="kw">str_detect</span>(war, <span class="st">'OVER_QUERY_LIMIT'</span>)) {
+          <span class="kw">print</span>(war)
+          try &lt;&lt;-<span class="st"> </span><span class="ot">TRUE</span>
+        }
+        <span class="cf">else</span> {
+          <span class="kw">print</span>(war)
+          try &lt;&lt;-<span class="st"> </span><span class="ot">FALSE</span>
+          result &lt;&lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">lon =</span> <span class="ot">NA</span>, <span class="dt">lat =</span> <span class="ot">NA</span>)
+        }
+      })
+  }
+  row =<span class="st"> </span><span class="kw">cbind</span>(<span class="kw">as.data.frame</span>(city), result)
+  <span class="kw">print</span>(row)
+  missingCitiesLocations =<span class="st"> </span><span class="kw">rbind</span>(missingCitiesLocations, row)
+}
+
+<span class="kw">write_csv</span>(missingCitiesLocations, <span class="st">'data/generated/missingCitiesLocations.csv'</span>)</code></pre></div>
+<div class="persian_normal">
+<p>در نهایت در data_cleaning.R این مختصات را به داده اضافه کردیم و داده‌ی تمیز شده‌ی نهایی را به نام pantheon_cleaned.csv ذخیره کردیم:</p>
+</div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#birth locations</span>
+data =<span class="st"> </span>data <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(birthcity) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">LAT =</span> <span class="kw">ifelse</span>(<span class="kw">is.na</span>(LAT) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(birthcity), <span class="kw">first</span>(LAT[<span class="op">!</span><span class="kw">is.na</span>(LAT)]), LAT),
+         <span class="dt">LON =</span> <span class="kw">ifelse</span>(<span class="kw">is.na</span>(LON) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(birthcity), <span class="kw">first</span>(LON[<span class="op">!</span><span class="kw">is.na</span>(LON)]), LON)
+  ) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">ungroup</span>()
+locationNAs =<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(<span class="kw">is.na</span>(LAT) <span class="op">|</span><span class="st"> </span><span class="kw">is.na</span>(LON))
+missingCitiesLocation =<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">'data/generated/missingCitiesLocations.csv'</span>)
+locationNAs =<span class="st"> </span><span class="kw">left_join</span>(
+  locationNAs <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span>LON, <span class="op">-</span>LAT),  
+  missingCitiesLocation <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rename</span>(<span class="dt">birthcity =</span> city, <span class="dt">LON =</span> lon, <span class="dt">LAT =</span> lat),
+  <span class="dt">by =</span> <span class="st">'birthcity'</span>
+)
+data =<span class="st"> </span><span class="kw">rbind</span>(
+    data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(LON), <span class="op">!</span><span class="kw">is.na</span>(LAT)),
+    locationNAs
+  ) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(name)
+<span class="kw">write_csv</span>(data, <span class="st">'data/generated/pantheon_cleaned.csv'</span>)</code></pre></div>
+<div class="persian_normal">
+
+</div>
+<div class="persian_normal">
+
 </div>
 </section>
 
