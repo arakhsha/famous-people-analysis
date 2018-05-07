@@ -21,7 +21,6 @@ HA = rbind(regular, comma) %>%
 pantheon = read_csv('data/generated/pantheon_cleaned.csv')
 
 pantheon_sci = pantheon %>% 
-  filter(domain %in% c("SCIENCE & TECHNOLOGY", "ARTS")) %>% 
   select(pname = name, pbirth = birthyear, en_curid)
 HA_unique = HA %>%
   select(Name, Serial, Birth) %>%
@@ -69,7 +68,8 @@ matchings = matchings %>%
   mutate(name_dist = stringdist(hname, pname))
 
 matchings = matchings %>% 
-  filter(name_dist < 2 | (name_dist == 2 & birth_dist <= 5)) %>% 
+  filter(name_dist < 2 | (name_dist == 2 & birth_dist <= 5) | (name_dist == 3 & birth_dist <= 0)) 
+matchings = matchings %>% 
   select(Serial, en_curid)
 
 write_csv(matchings, 'HA-PAN_linkage.csv')
