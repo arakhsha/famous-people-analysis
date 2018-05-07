@@ -77,3 +77,12 @@ run_all.R:
 این کد تمام کدها را اجرا می&zwnj;کند تا گزارش&zwnj;ها تولید شوند.
 </div>
 
+<p class = "persian_header">
+کنترل نسخه
+</p>
+
+<div class = "persian_normal">
+برای کنترل نسخه از github استفاده کردیم. می&zwnj;توانید آن را در
+<a href = 'https://github.com/arakhsha/famous-people-analysis'> اینجا </a>
+مشاهده کنید. با توجه به یک نفری بودن پروژه نیازی به همگام سازی مداوم نسخه&zwnj;ی آنلاین نیست و معمولا مقداری عقب&zwnj;تر است.
+</div>
