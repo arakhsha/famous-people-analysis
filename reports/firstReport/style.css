@@ -1,0 +1,39 @@
+@font-face {
+  font-family: 'Nazanin';
+  src: 	url('fonts/Nazanin.eot') format('eot'),  
+		url('fonts/Nazanin.woff') format('woff'),
+		url('fonts/Nazanin.ttf') format('truetype');
+  font-style:normal;
+  font-weight:normal;
+}
+.title, .author, .date, .subtitle{
+	font-family : 'Nazanin';
+	direction : rtl;
+}
+
+.persian_normal{
+	font-family : 'Nazanin';
+	font-size: 18px;
+	direction : rtl;
+	text-align: justify;
+}
+
+.persian_header{
+	font-family : 'Nazanin';
+	font-size: 25px;
+	direction : rtl;
+}
+
+.persian_subheader{
+	font-family : 'Nazanin';
+	font-size: 22px;
+	direction : rtl;
+}
+
+.latin{
+	font-family : 'Calibri', 'Arial';
+}
+
+.main-container .main-content{
+	text-align: justify;
+}

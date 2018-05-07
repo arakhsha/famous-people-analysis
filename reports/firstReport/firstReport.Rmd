@@ -1,0 +1,18 @@
+---
+title: "تحلیل اشخاص معروف جهانی"
+subtitle: "گزارش اولیه"
+author: "امین رخشا ۹۵۱۰۹۳۱۵"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+<link rel="stylesheet" type="text/css" href="style.css">
+
+<p class = "persian_header">
+نیم&zwnj;فاصله
+</p>
+
+<div class = "persian_normal">
+
+</div>
