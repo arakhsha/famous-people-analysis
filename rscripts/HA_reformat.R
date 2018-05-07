@@ -1,6 +1,5 @@
 library(readxl)
 library(stringr)
-library(RecordLinkage)
 library(stringdist)
 HA = read_excel('data/HA/HA.xlsx')
 comma = HA %>% filter(str_detect(Name, ','))
@@ -70,4 +69,7 @@ matchings = matchings %>%
   mutate(name_dist = stringdist(hname, pname))
 
 matchings = matchings %>% 
-  filter(name_dist < 2 | (name_dist == 2 & birth_dist <= 5))
+  filter(name_dist < 2 | (name_dist == 2 & birth_dist <= 5)) %>% 
+  select(Serial, en_curid)
+
+write_csv(matchings, 'HA-PAN_linkage.csv')
