@@ -1,4 +1,5 @@
 library(readr)
+library(readxl)
 library(highcharter)
 library(ggplot2)
 library(ggthemes)
