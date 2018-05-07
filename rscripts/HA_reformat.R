@@ -68,3 +68,6 @@ matchings = matchings %>%
   filter(birth_dist < 30)
 matchings = matchings %>%
   mutate(name_dist = stringdist(hname, pname))
+
+matchings = matchings %>% 
+  filter(name_dist < 2 | (name_dist == 2 & birth_dist <= 5))
