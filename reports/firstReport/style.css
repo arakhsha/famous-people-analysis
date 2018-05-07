@@ -20,8 +20,11 @@
 
 .persian_header{
 	font-family : 'Nazanin';
-	font-size: 25px;
+	font-size: 27px;
 	direction : rtl;
+	color: #159957;
+	font-weight: 400;
+	margin-top: 4rem;
 }
 
 .persian_subheader{
