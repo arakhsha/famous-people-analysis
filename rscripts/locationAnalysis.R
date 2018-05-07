@@ -176,3 +176,4 @@ worldBubbleTimePlot = hcmap(download_map_data = F) %>%
 worldBubbleTimePlot
 write_rds(worldBubbleTimePlot, 'output/worldBubbleTimePlot.rds')
 
+
