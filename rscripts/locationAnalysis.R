@@ -64,7 +64,7 @@ EXPLORATION = bubbleData %>% filter(domain == 'EXPLORATION')
 SPORTS = bubbleData %>% filter(domain == 'SPORTS')
 SCALE = bubbleData %>% filter(domain == 'SCALE')
 
-worldBubbleTimePlot = hcmap(download_map_data = F) %>%
+worldBubbleTimePlot = hcmap() %>%
   
   hc_add_series(
     data = INSTITUTIONS,
