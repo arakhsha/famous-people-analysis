@@ -15,5 +15,11 @@ visitByGender[,1:2] = lapply(visitByGender[,1:2], function(x) {as.numeric(as.cha
 visitByGender = visitByGender %>% 
   as.data.frame() %>% 
   mutate(Male = Mvisit / (Mvisit + Fvisit), Female = Fvisit / (Mvisit + Fvisit))
-hchart(visitByGender, type = 'line', hcaes(x = Date, y = Female))  
 
+femaleVisitsByTime = hchart(visitByGender,
+                            type = 'line',
+                            name = 'Visit Proportion',
+                            hcaes(x = Date, y = round(Female, 3)))  %>% 
+  hc_yAxis(title = list(text = 'Femal Pages Visit Proportion'))
+femaleVisitsByTime
+saveRDS(femaleVisitsByTime, 'femaleVisitsByTime.rds')
