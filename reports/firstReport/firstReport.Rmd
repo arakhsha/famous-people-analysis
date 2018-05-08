@@ -325,3 +325,19 @@ write_csv(matchings, 'HA-PAN_linkage.csv')
 <div class = "persian_normal">
 در آینده با استفاده از این دو داده سعی می&zwnj;کنیم تحلیل&zwnj;هایی انجام دهیم.
 </div>
+
+<div class = "persian_header">
+تحلیل جنسیتی
+</div>
+
+<div class = "persian_normal">
+این تحلیل در مراحل اولیه&zwnj;ی کار است و کار زیادی در آن انجام نشده است. برای شروع نمودار نسبت بازدید صفحات زنان را رسم کردیم:
+</div>
+
+```{r echo = FALSE, fig.align='center'}
+read_rds('../../output/femaleVisitsByTime.rds')
+```
+
+<div class = "persian_normal">
+قصد داریم در آینده زمینه&zwnj;های کاری و کشورهایی&zwnj;که زنان مشهور بیشتری دارند و همیجنین زبان&zwnj;های ویکیپدیایی که زنان در آن&zwnj;ها بیشتر بازدید می&zwnj;شوند را بیابیم.
+</div>
