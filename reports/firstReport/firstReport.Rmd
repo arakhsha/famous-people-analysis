@@ -8,7 +8,7 @@ output:
     highlight: github
 ---
 <link rel="stylesheet" type="text/css" href="style.css">
-```{r echo = FALSE}
+```{r message=FALSE, warning=FALSE, include=FALSE}
 library(readr)
 library(highcharter)
 library(ggplot2)
@@ -197,16 +197,127 @@ write_csv(data, 'data/generated/pantheon_cleaned.csv')
 read_rds('../../output/worldBubbleTimePlot.rds')
 ```
 
+<br/>
+<br/>
+<div class = "persian_normal">
+اندازه&zwnj;ی نقاط متناسب با HPI که شاخصی برای "بزرگی" فرد (بر اساس بازدید صفحات و زمان تولد) است می&zwnj;باشد. زمینه&zwnj;های کاری مشخص شده هم به این صورت هستند:
+</div>
 
+<div align="center">
+<img src = 'images/Domain_Taxonomy.jpg' align = 'center'>
+</div>
+
+<div class = "persian_normal">
+نمودار موقعیت مکانی تمام افراد در تمام ادوار هم به شکل زیر است:
+</div>
+
+```{r echo = FALSE, fig.align='center'}
+read_rds('../../output/worldPointPlot.rds')
+```
+
+<div class = "persian_normal">
+مهم&zwnj;ترین نکته&zwnj;ای که توجه را به خود جلب می&zwnj;کند این است که حتی در دورانی که به دوران اوج شرق مشهور است، بیشتر افراد در اروپا قرار دارند. این مسئله کنجکاوی ما را برانگیخت! به دنبال راهی گشتیم تا این مسئله را بررسی کنیم که آیا واقعا تعداد افراد موثر بر جهان در اروپا بیشتر بوده است یا کسانی که در اروپا بودند بیشتر معروف شده&zwnj;اند. برای همین به سراغ داده&zwnj;ی موفقیت&zwnj;های بشر ( Human Accomplishments ) رفتیم...
+</div>
 
 <p class = "persian_header">
 داده&zwnj;ی موفقیت&zwnj;های بشر
 </p>
 
-<div class = "persian_normal">
 
+<div class = "persian_normal">
+این داده توسط چارلز موری به عنوان کتاب چاپ و اخیرا به طور رایگان منتشر شده است. موری در این کتاب اطالاعات ۴۰۰۰ مبتکر در زمینه&zwnj;های هنر و علم را از ۸۰۰ سال قبل از میلاد مسیح تا سال ۱۹۵۰ را جمع&zwnj;آوری کرده است. او همچنین برای افراد یک شاخص نشانگر اهمیت کارهای آن شخص به دست آورده است. برای مشخص کردن افراد و این شاخص او به منابع اصلی هر رشته (دایرة المعارف&zwnj;ها، کتب تاریخی و ...) و همچنین نظرسنجی&zwnj;ها مراجعه کرده است و بر اساس این که منابع چقدر به شخص پرداخته&zwnj;اند و در نظرسنجی&zwnj;ها چه گفته شده میزان اهمیت کار افراد را پیدا کرده است و ۴۰۰۰ نفر را برگزیده است. خوبی این داده این است که به معروفیت افراد وابستگی کمی دارد و می&zwnj;توانیم افرادی را در آن بیابیم که بسیار موثر بوده&zwnj;اند ولی معروف نشده&zwnj;اند. این به ما کمک می&zwnj;کند به سوالی که مطرح کردیم پاسخ بدهیم.
+</div>
+
+<div class = "persian_header">
+ارتباط داده&zwnj;ی HA با داده&zwnj;ی اصلی
 </div>
 
 <div class = "persian_normal">
-
+برای این که بتوانیم تحلیلی انجام دهیم باید بتوانیم این دو داده را به هم متصل کنیم و سطرهایی که مربوط به یک شخص هستند را پیدا کنیم. این کار با توجه به این که اسم افراد در دو داده به یک صورت نیامده کار آسانی نیست. مخصوصا در داده&zwnj;ی موفقیت&zwnj;ها ( HA ) اسم افراد به روش&zwnj;های مختلفی آمده است. ممکن است در یک داده اسم وسط آمده باشد و در دیگری نیامده باشد، اسم افراد غیرانگلیسی به روش&zwnj;های مختلف نوشته شده باشد و...
 </div>
+
+<div class = "persian_normal">
+در ابتدا سعی کردیم از پکیج RecordLinkage استفاده کنیم اما متاسفانه موفق به گرفتن خروجی مناسبی نشدیم. برای همین سعی کردیم خودمان این کار را انجام دهیم.
+</div>
+
+<div class = "persian_normal">
+به همین دلیل باید سعی کنیم تا حدی این اسامی را به هم شبیه کنیم. برای این کار: نام کوچک و بزرگ را استخراج و با ترتیب درست می&zwnj;چسبانیم، حروف غیرانگلیسی را به مشابه انگلیسی آن&zwnj;ها تبدیل می&zwnj;کنیم، نام&zwnj;ها وسط را حذف می&zwnj;کنیم و تمام حروف را به کوچک تبدیل می&zwnj;کنیم. مرحله&zwnj;ی بعدی این است که معیاری برای شباهت اسامی به دست آوریم. مترهای گوناگونی برای این مسئله موجود است که در پکیج stringdist پیاده سازی شده&zwnj;اند. مترهای مختلف را آزمایش کردیم و برخی مقالات مربوط به این کار را خواندیم و در نهایت از osa استفاده کردیم. در نهایت باید جفت سطرهایی که مربوط به یک نفر هستند را مشخص می&zwnj;کردیم. خوشبختانه در دو داده تاریخ تولد افراد هم موجود بود. با این که منابع مختلف ممکن است برای یک شخص تاریخ&zwnj;های متفاوتی ذکر کنند، این اعداد معمولا به هم شبیه هستند. با ترکیبی از این دو عامل و مقداری بررسی دستی، به مرز تا حد بسیار قابل قبولی رسیدیم. این فرآیند در HA_linkage.R انجام می&zwnj;شود و نتیجه را ذخیره می&zwnj;کند.
+</div>
+
+```{r eval = FALSE}
+library(readxl)
+library(stringr)
+library(stringdist)
+HA = read_excel('data/HA/HA.xlsx')
+comma = HA %>% filter(str_detect(Name, ','))
+regular = HA %>% filter(!str_detect(Name, ','))
+commaNames = comma$Name %>% 
+  str_split_fixed(',', 2) %>% 
+  as.data.frame() %>% 
+  rename(last = V1, first = V2) %>% 
+  mutate(original = comma$Name) %>% 
+  mutate(fisrt = str_trim(first, side = 'both'),
+         last = str_trim(last, side = 'both')) %>% 
+  mutate(reformated = paste(first,last))
+comma$Name = commaNames$reformated
+HA = rbind(regular, comma) %>% 
+  mutate(Name = str_trim(Name, side = 'both')) %>% 
+  arrange(Name) 
+
+
+pantheon = read_csv('data/generated/pantheon_cleaned.csv')
+
+pantheon_sci = pantheon %>% 
+  select(pname = name, pbirth = birthyear, en_curid)
+HA_unique = HA %>%
+  select(Name, Serial, Birth) %>%
+  distinct() %>% 
+  select(hname = Name, hbirth = Birth, Serial)
+
+to.plain <- function(s) {
+  
+  # 1 character substitutions
+  old1 <- "šžþàáâãäåçćčèéêëìíîïðñòóôõöùúûüý"
+  new1 <- "szyaaaaaaccceeeeiiiidnooooouuuuy"
+  s1 <- chartr(old1, new1, s)
+  
+  # 2 character substitutions
+  old2 <- c("œ", "ß", "æ", "ø")
+  new2 <- c("oe", "ss", "ae", "oe")
+  s2 <- s1
+  for(i in seq_along(old2)) s2 <- gsub(old2[i], new2[i], s2, fixed = TRUE)
+  
+  s2
+}
+
+standardizeName = function(s) {
+  result = str_to_lower(to.plain(s))
+  fname = str_extract(result, "^[[:graph:]]+ ")
+  fname[is.na(fname)] = ""
+  lname = str_extract(result, "[[:graph:]]+$")
+  result = paste(fname, lname)
+  result = str_trim(result, side = 'both')
+  return(result)
+}
+pantheon_sci = pantheon_sci %>% mutate(pname = standardizeName(pname))
+HA_unique = HA_unique %>% mutate(hname = standardizeName(hname))
+
+matchings = expand.grid(
+  HA$Serial,
+  pantheon_sci$en_curid
+)
+colnames(matchings) = c('Serial', 'en_curid')
+matchings = matchings %>% left_join(pantheon_sci) %>% left_join(HA_unique)
+matchings = matchings %>% 
+  mutate(birth_dist = abs(hbirth - pbirth)) %>% 
+  filter(birth_dist < 30)
+matchings = matchings %>%
+  mutate(name_dist = stringdist(hname, pname))
+
+matchings = matchings %>% 
+  filter(name_dist < 2 | (name_dist == 2 & birth_dist <= 5) | (name_dist == 3 & birth_dist <= 0)) 
+matchings = matchings %>% 
+  select(Serial, en_curid)
+
+write_csv(matchings, 'HA-PAN_linkage.csv')
+```
