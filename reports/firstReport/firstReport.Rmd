@@ -328,6 +328,22 @@ write_csv(matchings, 'HA-PAN_linkage.csv')
 </div>
 
 <div class = "persian_header">
+پاسخ به فرضیه!
+</div>
+
+<div class = "persian_normal">
+حال بالاخره می&zwnj;توانیم فرضیه&zwnj;مان را بررسی کنیم. از بین افراد داده&zwnj;ی HA افرادی را که در داده&zwnj;ی pantheon موجود بودند یعنی به معروفیت رسیده&zwnj;اند را جدا کردیم. حال شاخص دهک آخر افراد در هر ناحیه را مقایسه می&zwnj;کنیم. به این معنی که نگاه می&zwnj;کنیم کسی که در مرز ۱۰ درصد پایینی است چه شاخصی داشته است. هر چه این مقدار بیشتر باشد به این معنی است که افراد آن ناحیه برای معروفیت باید کار مهم&zwnj;تری انجام دهند. نتیجه به این صورت است:
+</div>
+
+```{r echo = FALSE, fig.align='center'}
+read_rds('../../output/indexComparisonPlot.rds')
+```
+
+<div class = "persian_normal">
+می&zwnj;بینیم که آسیایی&zwnj;ها برای این که در جهان امروز معروف باشند باید به مقدار قابل توجهی کار مهم&zwnj;تری کرده باشند! 
+</div>
+
+<div class = "persian_header">
 تحلیل جنسیتی
 </div>
 
