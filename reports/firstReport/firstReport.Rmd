@@ -8,6 +8,11 @@ output:
     highlight: github
 ---
 <link rel="stylesheet" type="text/css" href="style.css">
+```{r echo = FALSE}
+library(readr)
+library(highcharter)
+library(ggplot2)
+```
 
 <p class = "persian_header">
 مقدمه
@@ -179,6 +184,24 @@ data = rbind(
   arrange(name)
 write_csv(data, 'data/generated/pantheon_cleaned.csv')
 ```
+
+<p class = "persian_header">
+تحلیل مکانی
+</p>
+
+<div class = "persian_normal">
+در این بخش سعی می&zwnj;کنیم بر روی موقعیت مکانی افراد متمرکز شویم. برای داشتن دید کلی ابتدا با استفاده از طول و عرض جغرافیایی که به دست آوردیم، سعی کردیم یک نمودار تعاملی از موقعیت افراد در گذر زمان به رسم کنیم. این کار نیازمند یادگیری کار با پلاگین motion برای کتابخانه&zwnj;ی highcharter بود که زمان زیادی به دلیل نبود مستند سازی خوب گرفت. همچنین داشتن یک نمودار خوب و ثابت نگه داشتن مقیاس معروفیت در گذر زمان با این که شاید به نظر نیاید وقت زیادی گرفت. کد این نمودرا را به علت حجم زیاد در اینجا نمی&zwnj;آوریم ولی نتیجه را می&zwnj;توانید در زیر ببینید:
+</div>
+
+```{r echo = FALSE}
+read_rds('../../output/worldBubbleTimePlot.rds')
+```
+
+
+
+<p class = "persian_header">
+داده&zwnj;ی موفقیت&zwnj;های بشر
+</p>
 
 <div class = "persian_normal">
 
