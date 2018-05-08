@@ -22,4 +22,4 @@ femaleVisitsByTime = hchart(visitByGender,
                             hcaes(x = Date, y = round(Female, 3)))  %>% 
   hc_yAxis(title = list(text = 'Femal Pages Visit Proportion'))
 femaleVisitsByTime
-saveRDS(femaleVisitsByTime, 'femaleVisitsByTime.rds')
+saveRDS(femaleVisitsByTime, 'output/femaleVisitsByTime.rds')
