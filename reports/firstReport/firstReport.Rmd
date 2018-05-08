@@ -50,6 +50,7 @@ rscripts
 output
 |-- worldBubbleTimePlot.rds
 |-- worldPointPlot.rds
+|-- femaleVisitsByTime.rds
 run_all.R
 ReadMe.md
 .gitignore
