@@ -176,4 +176,63 @@ worldBubbleTimePlot = hcmap() %>%
 worldBubbleTimePlot
 write_rds(worldBubbleTimePlot, 'output/worldBubbleTimePlot.rds')
 
+links = read_csv('data/generated/HA-PAN_linkage.csv')
+HA = read_excel('data/HA/HA.xlsx') %>% 
+  left_join(links) %>% 
+  left_join(data %>% select(AverageViews, en_curid))
 
+
+Europe = c(
+  "Rome"      ,
+  "Britain"  ,
+  "Norway"    ,
+  "France"     ,
+  "Belgium"    ,
+  "Germany"   ,
+  "Hungary"   ,
+  "Anc Greece",
+  "Netherlands",
+  "Switzerland" ,
+  "Italy" ,
+  "Russia"    ,
+  "Spain"     ,
+  "Sweden"    ,
+  "Denmark"   ,
+  "Balkans"   ,
+  "Poland"    ,
+  "Austria"   ,
+  "Czech"      ,
+  "Slovakia" ,
+  "Portugal"  ,
+  "Finland"   ,
+  "Iceland"
+)
+
+NorthAmerica = c('USA', 'Canada')
+SouthAmerica = c('Latin Am')
+Africa = c('SS Africa')
+Australia = c('Australia', 'New Zealand')
+Asia = c("Arab World", "Japan", "China", "India")
+
+HA$BirthCountry[HA$BirthCountry %in% Europe] = 'Europe'
+HA$BirthCountry[HA$BirthCountry %in% NorthAmerica] = 'NorthAmerica'
+HA$BirthCountry[HA$BirthCountry %in% SouthAmerica] = 'SouthAmerica'
+HA$BirthCountry[HA$BirthCountry %in% Africa] = 'Africa'
+HA$BirthCountry[HA$BirthCountry %in% Australia] = 'Australia'
+HA$BirthCountry[HA$BirthCountry %in% Asia] = 'Asia'
+
+
+minIndex = HA %>% 
+  filter(!is.na(en_curid)) %>%
+  filter(BirthCountry %in% c('Asia', 'Europe', 'NorthAmerica')) %>% 
+  group_by(BirthCountry) %>% 
+  summarise(q1 = as.numeric(quantile(Index, probs = c(0.1), na.rm = T))) %>% 
+  rename(BirthRegion = BirthCountry)
+
+indexComparisonPlot = hchart(minIndex, type = 'column', 
+       hcaes(x = BirthRegion, y = round(q1, 2)),
+       name = 'First Decile of HA Index') %>% 
+  hc_title(text = 'First Decile of HA Index for Famous People from Different Regions') %>% 
+  hc_yAxis(title = list(text = 'First Decile of HA Index'))
+indexComparisonPlot
+saveRDS(indexComparisonPlot, 'output/indexComparisonPlot.rds')
