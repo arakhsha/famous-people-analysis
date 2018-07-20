@@ -15,6 +15,8 @@ centuryCount = data %>%
   group_by(century) %>% 
   summarise(count = n()) %>% 
   filter(century > -35, century < 21) %>% 
+  right_join(data.frame(century = centuries)) %>% 
+  mutate(count = ifelse(is.na(count), 0, count)) %>% 
   left_join(worldPop) %>% 
   mutate(ratio = round(count / worldPop, 2))
 
@@ -22,7 +24,7 @@ centuryCount = data %>%
 centuryCountPlot = hchart(centuryCount, type = "line",
                           hcaes(x = century, y = count), name = "Number of Famous People",
                           showInLegend = T) %>% 
-  hc_xAxis(title = list(text = "Century")) %>% 
+  hc_xAxis(title = list(text = "Century"), crosshair = T) %>% 
   hc_yAxis_multiples(
     list(title = list(text = "Number of Famous People"), showEmpty = F),
     list(title = list(text = "World Population (Million)"),  labels = F, showEmpty = F),
@@ -36,3 +38,33 @@ centuryCountPlot = hchart(centuryCount, type = "line",
   hc_title(text = "Number of Famous People Over Time")
 
 centuryCountPlot
+saveRDS(centuryCountPlot, "output/centuryCountPlot.rds")
+
+timeContinent = data %>% 
+  group_by(century, continentName) %>% 
+  summarise(count = n()) %>% 
+  ungroup() %>% 
+  filter(century > -35, century < 21) %>% 
+  right_join(expand.grid(century = centuries, continentName = unique(data$continentName))) %>% 
+  mutate(count = ifelse(is.na(count), 0, count)) %>% 
+  drop_na() %>% 
+  group_by(century) %>% 
+  mutate(ratio = count / sum(count) ) %>% 
+  group_by(century) %>% 
+  mutate(ratio = ifelse(is.finite(ratio), ratio, NA)) %>% 
+  group_by(continentName) %>% 
+  fill(ratio, .direction = "up") %>% 
+  filter(century >= -11, century < 21)
+
+timeContinentPlot = hchart(timeContinent, type = "area", hcaes(x = century, y = count, group = continentName),
+       marker = list(radius = 0)) %>% 
+  hc_plotOptions(area = list(stacking = "percent")) %>% 
+  hc_tooltip(shared = T) %>% 
+  hc_xAxis(title = list(text = "Century"), crosshair = T) %>% 
+  hc_yAxis(title = list(text = "Count (%)")) 
+timeContinentPlot
+saveRDS(timeContinentPlot, "output/timeContinentPlot.rds")
+  
+  
+  
+  
