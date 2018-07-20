@@ -20,6 +20,49 @@ femaleVisitsByTime = hchart(visitByGender,
                             type = 'line',
                             name = 'Visit Proportion',
                             hcaes(x = Date, y = round(Female, 3)))  %>% 
-  hc_yAxis(title = list(text = 'Femal Pages Visit Proportion'))
+  hc_yAxis(title = list(text = 'Female Pages Visit Proportion'))
 femaleVisitsByTime
 saveRDS(femaleVisitsByTime, 'output/femaleVisitsByTime.rds')
+
+hchart(visitByGender,
+       type = 'line',
+       name = 'Male Visit',
+       hcaes(x = Date, y = round(Mvisit, 3))) %>% 
+  hc_add_series(visitByGender,
+                type = 'line',
+                name = 'Female Visit',
+                hcaes(x = Date, y = round(Fvisit, 3)))
+
+
+genderOccupation = data %>% 
+  group_by(occupation, gender) %>% 
+  summarise(count = n()) %>% 
+  spread(gender, count) %>% 
+  mutate(Male = ifelse(!is.na(Male), Male, 0),
+         Female = ifelse(!is.na(Female), Female, 0)) %>% 
+  mutate(rMale = Male / (Male + Female) , rFemale = Female / (Male + Female)) %>% 
+  arrange(rMale)
+
+
+genderOccupationPlot = hchart(
+    genderOccupation,
+    hcaes(x = occupation, y = rMale),
+    type = "bar",
+    name = "Male",
+    showInLegend = T,
+    step = 1
+  )%>% 
+  hc_add_series(
+    data = genderOccupation,
+    hcaes(x = occupation, y = rFemale),
+    type = "bar",
+    name = "Female",
+    showInLegend = T
+  ) %>% 
+  hc_plotOptions(series = list(stacking = T))
+
+saveRDS(genderOccupationPlot, "output/genderOccupationPlot.rds")
+
+
+
+
