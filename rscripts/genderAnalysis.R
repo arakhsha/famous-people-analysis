@@ -60,7 +60,7 @@ genderOccupationPlot = hchart(
     showInLegend = T
   ) %>% 
   hc_plotOptions(series = list(stacking = T))
-
+genderOccupationPlot
 saveRDS(genderOccupationPlot, "output/genderOccupationPlot.rds")
 
 genderEQcountry = data %>% 
