@@ -3,7 +3,7 @@ data = data %>%
   arrange(-TotalPageViews) %>% 
   mutate(part = ceiling(row_number() / n() * 100))
 
-for(i in 8:15) {
+for(i in 1:100) {
   ids = data %>% filter(part == i) %>% .$en_curid
   partData = list()
   for(j in 1:length(ids)) {
