@@ -27,4 +27,9 @@ data = rbind(
     locationNAs
   ) %>% 
   arrange(name)
+
+data = data %>% 
+  group_by(countryCode) %>% 
+  mutate(countryName = str_to_title(first(countryName)))
+
 write_csv(data, 'data/generated/pantheon_cleaned.csv')
