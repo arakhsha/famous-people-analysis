@@ -236,3 +236,45 @@ indexComparisonPlot = hchart(minIndex, type = 'column',
   hc_yAxis(title = list(text = 'First Decile of HA Index'))
 indexComparisonPlot
 saveRDS(indexComparisonPlot, 'output/indexComparisonPlot.rds')
+
+
+countryOccupation = data %>% 
+  group_by(countryCode3, occupation) %>% 
+  summarise(totalViews = sum(TotalPageViews / 1000, na.rm = T), countryName = first(countryName)) %>% 
+  arrange(-totalViews) %>% 
+  slice(1) 
+
+occupationCount = countryOccupation %>% 
+  group_by(name = occupation) %>% 
+  summarise(count = n())
+
+colors = c(
+  brewer.pal(n = 9, name = "Set1"),
+  brewer.pal(n = 8, name = "Set2"),
+  brewer.pal(n = 12, name = "Set3"),
+  brewer.pal(n = 12, name = "Paired")
+)
+
+series = countryOccupation %>% 
+  group_by(name = occupation) %>% 
+  do(data = list_parse(select(., countryCode3, countryName))) %>%
+  ungroup() %>% 
+  left_join(occupationCount) %>% 
+  arrange(-count) %>% 
+  select(-count) %>% 
+  mutate(color = colors[1:n()])
+  
+map <- download_map_data()
+
+countryOccupationPlot = highchart(type = "map") %>% 
+  hc_plotOptions(map = list(
+    allAreas = FALSE,
+    joinBy = c("iso-a3", "countryCode3"),
+    mapData = map
+  )) %>% 
+  hc_add_series_list(series) %>% 
+  hc_tooltip(pointFormat = "<b> {series.name} </b>",
+             headerFormat = '<span style="font-size: 10px">{point.key}</span><br/>') %>% 
+  hc_title(text = "Dominant Occupation of Countries")
+countryOccupationPlot
+saveRDS(countryOccupationPlot, "output/countryOccupationPlot.rds")
