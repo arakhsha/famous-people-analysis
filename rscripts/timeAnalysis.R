@@ -14,11 +14,11 @@ worldPop = read_csv('data/worldPopulation_selected.csv') %>%
 centuryCount = data %>% 
   group_by(century) %>% 
   summarise(count = n()) %>% 
-  filter(century > -35, century < 21) %>% 
   right_join(data.frame(century = centuries)) %>% 
   mutate(count = ifelse(is.na(count), 0, count)) %>% 
   left_join(worldPop) %>% 
-  mutate(ratio = round(count / worldPop, 2))
+  mutate(ratio = round(count / worldPop, 2)) %>% 
+  filter(century > -35, century < 21)
 
 
 centuryCountPlot = hchart(centuryCount, type = "line",
