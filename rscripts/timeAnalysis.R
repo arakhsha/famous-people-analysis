@@ -66,5 +66,77 @@ timeContinentPlot
 saveRDS(timeContinentPlot, "output/timeContinentPlot.rds")
   
   
-  
-  
+#visit - time analysis ---------------
+visitData = read_tsv('data/pantheon/pageviews_2008-2013.tsv')
+
+visitData = visitData %>% 
+  gather(key = 'month', value = 'visits', `2008-01`:`2013-12`)
+
+lastYearVisits = visitData %>% 
+  filter(str_detect(month, "2013"))
+
+visit2013 = lastYearVisits %>%
+  group_by(en_curid, lang) %>% 
+  summarise(visit2013 = sum(visits))
+
+globalVisits = visit2013 %>% 
+  group_by(en_curid) %>% 
+  summarise(globalVisits = sum(visit2013))
+
+data = data %>% 
+  left_join(globalVisits) 
+
+getPalette = colorRampPalette(brewer.pal(12, "Paired"))
+set.seed(200)
+colors = getPalette(27) [sample(1:27, 27, replace = F)]
+centuries = min(data$century, na.rm = T):max(data$century, na.rm = T)
+
+domains = unique(data$domain)
+domainVisitTime = data %>% 
+  arrange(century) %>% 
+  group_by(century, domain) %>% 
+  summarise(visits = sum(globalVisits/ 1000000, na.rm = T)) %>% 
+  right_join(expand.grid(century = centuries, domain = domains)) %>% 
+  mutate(visits = ifelse(is.na(visits), 0, visits)) %>% 
+  group_by(century) %>% 
+  mutate(ratio = visits / sum(visits) * 100) %>% 
+  mutate(ratio = ifelse(is.finite(ratio), ratio, NA)) %>% 
+  group_by(domain) %>% 
+  fill(ratio, .direction = "up") %>% 
+  filter(century > -15, century < 21)
+
+domainVisitTimePlot = hchart(domainVisitTime, type = "area", hcaes(x = century, y = ratio, group = domain),
+       marker = list(radius = 0)) %>% 
+  hc_plotOptions(area = list(stacking = "percent")) %>% 
+  hc_tooltip(valueDecimals = 2) %>% 
+  hc_xAxis(title = list(text = "Century"), crosshair = T) %>% 
+  hc_yAxis(title = list(text = "Count (%)"), max = 100) %>% 
+  hc_tooltip(shared = T, headerFormat = '<span style="font-size: 10px">Century: {point.key}</span><br/>')
+domainVisitTimePlot
+saveRDS(domainVisitTimePlot, 'output/domainVisitTimePlot.rds')
+
+industries = data$industry %>% unique()
+industryVisitTime = data %>% 
+  arrange(century) %>% 
+  filter(industry %in% industries) %>% 
+  group_by(century, industry) %>% 
+  summarise(visits = sum(globalVisits / 1000000, na.rm = T)) %>% 
+  right_join(expand.grid(century = centuries, industry = industries)) %>% 
+  mutate(visits = ifelse(is.na(visits), 0, visits)) %>% 
+  group_by(century) %>% 
+  mutate(ratio = visits / sum(visits) * 100) %>% 
+  mutate(ratio = ifelse(is.finite(ratio), ratio, NA)) %>% 
+  group_by(industry) %>% 
+  fill(ratio, .direction = "up") %>% 
+  filter(century >= -11, century < 21)
+
+industryVisitTimePlot = hchart(industryVisitTime, type = "area", hcaes(x = century, y = ratio, group = industry),
+       marker = list(radius = 0)) %>% 
+  hc_plotOptions(area = list(stacking = "percent")) %>% 
+  hc_tooltip(valueDecimals = 2) %>% 
+  hc_colors(colors) %>% 
+  hc_xAxis(title = list(text = "Century"), crosshair = T) %>% 
+  hc_yAxis(title = list(text = "Count (%)"), max = 100) %>% 
+  hc_tooltip(headerFormat = '<span style="font-size: 10px">Century: {point.key}</span><br/>')
+industryVisitTimePlot
+saveRDS(industryVisitTimePlot, 'output/industryVisitTimePlot.rds')
