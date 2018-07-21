@@ -59,7 +59,9 @@ genderOccupationPlot = hchart(
     name = "Female",
     showInLegend = T
   ) %>% 
-  hc_plotOptions(series = list(stacking = T))
+  hc_plotOptions(series = list(stacking = T)) %>% 
+  hc_yAxis(title = list(text = ""), max = 1) %>% 
+  hc_title(text = "Occupations With Highest Women Share")
 genderOccupationPlot
 saveRDS(genderOccupationPlot, "output/genderOccupationPlot.rds")
 
