@@ -63,6 +63,34 @@ genderOccupationPlot = hchart(
 
 saveRDS(genderOccupationPlot, "output/genderOccupationPlot.rds")
 
+genderEQcountry = data %>% 
+  group_by(countryCode3, gender) %>% 
+  summarise(count = n()) %>% 
+  right_join(expand.grid(countryCode3 = unique(data$countryCode3), gender = unique(data$gender))) %>% 
+  mutate(count = ifelse(is.na(count), 0, count)) %>% 
+  group_by(countryCode3) %>% 
+  mutate(ratio = count / sum(count) * 100, total = sum(count)) %>% 
+  filter(gender == 'Female') %>% 
+  arrange(-ratio) %>% 
+  ungroup()
 
+map <- download_map_data()
+genderEQcountryPlot = highchart(type = "map") %>% 
+  hc_add_series_map(
+    df = genderEQcountry,
+    value = "ratio",
+    joinBy = c("iso-a3", "countryCode3"),
+    map = map,
+    name = "Female Ratio"
+  ) %>% 
+  hc_colorAxis(stops = list(c(0, "#e84118"), c(0.25, "#fbc531"), c(0.5, "#4cd137"),
+                            c(1, "#4cd137"))) %>% 
+  hc_tooltip(valueDecimals = 2,
+             pointFormat = "{series.name}:{point.value}",
+             headerFormat = '<span style="font-size: 10px">{point.key}</span><br/>') %>% 
+  hc_title(text = "Ratio of Female Famous People")
+
+genderEQcountryPlot
+saveRDS(genderEQcountryPlot, "output/genderEQcountryPlot.rds")
 
 
