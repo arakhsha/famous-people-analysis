@@ -1,6 +1,42 @@
 data = read_csv('data/generated/pantheon_cleaned.csv')
+data = data %>% 
+  mutate(century = ceiling(birthyear / 100))
 
+mapURL <- 'custom/world'
+countryCodes = unique(data$countryCode)
+timeCountry = data %>% 
+  group_by(century, countryCode) %>% 
+  summarise(count = n()) %>% 
+  ungroup() %>% 
+  group_by(century) %>% 
+  mutate(prop = (100  / sum(count)) * count) 
 
+cartesian = expand.grid(countryCode = countryCodes, century = -10:20)
+timeCountry = left_join(cartesian, timeCountry)
+timeCountry[is.na(timeCountry)] = 0
+
+sequences <- sapply(countryCodes, function(code) {
+  timeCountry %>% filter(countryCode == code) %>% .$prop
+})
+values = timeCountry %>% 
+  group_by(countryCode) %>% 
+  summarise(value = first(prop)) %>% 
+  .$value
+
+timeCountry <- data_frame(`hc-key` = countryCodes,
+                          sequence = sequences, 
+                          value = values)
+
+countryTimePlot = hcmap(mapURL,
+                        data = timeCountry,
+                        value = 'value',
+                        joinBy = c('hc-a2', 'hc-key')) %>% 
+  hc_motion(enabled = TRUE, series = 0, labels = -10:20,
+            loop = TRUE, autoPlay = TRUE, 
+            updateInterval = 1000, magnet = list(step =  1)) %>% 
+  hc_title(text = "Country Shares Over Time")
+countryTimePlot
+saveRDS(countryTimePlot, 'output/countryTimePlot.rds')
 
 worldPointPlot = ggplot() +
   coord_fixed() +
