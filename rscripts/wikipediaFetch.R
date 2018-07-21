@@ -28,3 +28,20 @@ for(i in 1:100) {
   filePath <- paste('data/generated/wikipedia/raw/part', i, '.rds', sep = "")
   saveRDS(partData, filePath)
 }
+
+dfs = list()
+for(i in 1:100) {
+  filePath <- paste('data/generated/wikipedia/raw/part', i, '.rds', sep = "")
+  partData = readRDS(filePath)
+  partTexts = data.frame(en_curid = numeric(), text = character(), stringsAsFactors = F)
+  for (j in 1:length(partData)) {
+    en_curid = partData[[j]]['id'] %>% as.numeric()
+    text = partData[[j]]['text'] %>% unlist() %>% 
+      str_c(collapse = " ")
+    partTexts = rbind(partTexts, data.frame(en_curid, text))
+  }
+  dfs[[i]] = partTexts
+  print(i)
+}
+wikipediaTexts = rbind_list(dfs)
+write_csv(wikipediaTexts, "data/generated/wikipedia/wikipediaTexts.csv")
